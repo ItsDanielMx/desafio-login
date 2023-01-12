@@ -7,6 +7,10 @@ const UserModel = require("./models/User.model");
 const {fork} = require('child_process')
 const yargs = require('yargs')
 const cpus = require('os')
+const loginRouter = require('./routes/login.router')
+const registerRouter = require('./routes/register.router')
+const logoutRouter = require('./routes/logout.router')
+const procesosRouter = require('./routes/procesos.router')
 
 require('dotenv').config({path:'./config/passwords.env'})
 const app = express();
@@ -41,6 +45,11 @@ app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
+
+app.use('/login', loginRouter)
+app.use('/register', registerRouter)
+app.use('/logout', logoutRouter)
+app.use('/info', procesosRouter)
 
 const isAuth = (req, res, next) => {
   if (!req.session.user) {
@@ -87,70 +96,6 @@ app.get('/api/randoms', (req, res) => {
       })
       }
   })
-})
-
-
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  const user = await UserModel.findOne({ email });
-
-  if (!user) {
-    return res.render("login", { msg_error: "Email no registrado" });
-  }
-
-  const passCoincide = await bcrypt.compare(password, user.password);
-
-  if (!passCoincide) {
-    return res.render("login", { msg_error: "Contraseña incorrecta" });
-  }
-
-  req.session.user = user;
-  res.render("dashboard", { user: user.username });
-});
-
-app.post("/register", async (req, res) => {
-  let { username, email, password } = req.body;
-
-  try {
-    let user = await UserModel.findOne({ email });
-
-    if (user) {
-      return res.render("register", { msg_error: "Email ya existe" });
-    }
-
-    user = await UserModel.findOne({ username });
-
-    if (user) {
-      return res.render("register", { msg_error: "Usuario ya existe" });
-    }
-
-    let hashedPassword = await bcrypt.hash(password, 12);
-
-    user = await UserModel.create({
-      username,
-      email,
-      password: hashedPassword,
-    });
-
-    await user.save();
-    res.render("login", { msg_error: "" });
-  } catch (error) {
-    return res.render("register", { msg_error: error.message });
-  }
-});
-
-app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) throw err;
-    res.redirect("/login");
-  });
-});
-
-app.get('/info', (req, res) => {
-  const processData = {
-  cpus: cpus().length
-  }
 })
 
 app.listen(PORT, () => console.log(`Server Up on port ${PORT}`));
