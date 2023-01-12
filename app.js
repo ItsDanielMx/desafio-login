@@ -7,9 +7,10 @@ const UserModel = require("./models/User.model");
 const {fork} = require('child_process')
 const yargs = require('yargs')
 
+require('dotenv').config({path:'./config/passwords.env'})
 const app = express();
 const { PORT } = yargs(process.argv.slice(2)).default({PORT: 8080}).argv
-const mongoUri = "mongodb://localhost:27017/desafio";
+const mongoUri = process.env.MONGOURI;
 
 mongoose
   .connect(mongoUri, {
@@ -24,14 +25,7 @@ const store = new MongoDBSession({
 });
 
 app.use(
-  session({
-    key: "user_id",
-    secret: "D4n1el",
-    resave: false,
-    saveUninitialized: false,
-    store: store,
-    cookie: { maxAge: 60000 },
-  })
+  session(process.env.SESSION)
 );
 
 app.set("views", "./views");
