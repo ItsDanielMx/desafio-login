@@ -42,16 +42,61 @@
     </nav>
 
     <section class="container mt-5">
-      <div>
-        <p>Argumentos de entrada: <%= process.argv %></p>
-        <p>Version de la plataforma: <%= process.platform %></p>
-        <p>Version del proceso: <%= process.version %></p>
-        <p>Memoria reservada: <%= process.memoryUsage().rss %></p>
-        <p>Path de ejecucion: <%= process.execPath %></p>
-        <p>Process ID: <%= process.pid %></p>
-        <p>Current working directory: <%= process.cwd() %></p>
-        <p>Procesadores del servidor: <%= cpus %>  </p>
-      </div>
+      <div class="">
+            <h2>Information view</h2>
+            <hr class="my-4">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Property</th>
+                    <th scope="col">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">1</th>
+                    <td>Input arguments</td>
+                    <td><%= args %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2</th>
+                    <td>Operating system</td>
+                    <td><%= platform %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">3</th>
+                    <td>Node version</td>
+                    <td><%= node %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">4</th>
+                    <td>Memory usage</td>
+                    <td><%= memory %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">5</th>
+                    <td>Node path</td>
+                    <td><%= path %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">6</th>
+                    <td>Process ID</td>
+                    <td><%= pid %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">7</th>
+                    <td>Proyect path</td>
+                    <td><%= folder %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">8</th>
+                    <td>Cores</td>
+                    <td><%= cpus %></td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
     </section>
   </div>
 </body>
