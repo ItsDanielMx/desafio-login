@@ -6,6 +6,7 @@ const MongoDBSession = require("connect-mongodb-session")(session);
 const UserModel = require("./models/User.model");
 const {fork} = require('child_process')
 const yargs = require('yargs')
+const cpus = require('os')
 
 require('dotenv').config({path:'./config/passwords.env'})
 const app = express();
@@ -25,7 +26,14 @@ const store = new MongoDBSession({
 });
 
 app.use(
-  session(process.env.SESSION)
+  session({
+    key: "user_id",
+    secret: "D4n1el",
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+    cookie: { maxAge: 60000 },
+  })
 );
 
 app.set("views", "./views");
@@ -61,7 +69,6 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login", { msg_error: "" });
 });
-
 
 app.get('/api/randoms', (req, res) => {
   const amount = req.query.amount ? parseInt(req.query.amount) : 100000000
@@ -139,5 +146,11 @@ app.post("/logout", (req, res) => {
     res.redirect("/login");
   });
 });
+
+app.get('/info', (req, res) => {
+  const processData = {
+  cpus: cpus().length
+  }
+})
 
 app.listen(PORT, () => console.log(`Server Up on port ${PORT}`));
