@@ -3,10 +3,11 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBSession = require("connect-mongodb-session")(session);
-const UserModel = require("./models/User.model");
 const {fork} = require('child_process')
 const yargs = require('yargs')
-const cpus = require('os')
+const core = require('os')
+const cluster = require('cluster')
+const UserModel = require("./models/User.model");
 const loginRouter = require('./routes/login.router')
 const registerRouter = require('./routes/register.router')
 const logoutRouter = require('./routes/logout.router')
@@ -15,8 +16,26 @@ const procesosRouter = require('./routes/procesos.router')
 require('dotenv').config({path:'./config/passwords.env'})
 const app = express();
 const { PORT } = yargs(process.argv.slice(2)).default({PORT: 8080}).argv
-const mongoUri = process.env.MONGOURI;
+const { mode } = yargs(process.argv.slice(2)).default({mode: 'FORK'}).argv
 
+if(cluster.isPrimary){
+    console.log(`Father | Process ID: ${process.pid}`)
+    if(mode === 'CLUSTER'){
+        for(let i = 0; i < core.cpus().length; i++){
+            cluster.fork()
+        }
+    }
+    else {
+        cluster.fork()
+    }
+}
+else {
+    const server = app.listen(PORT, () => {
+        console.log(`Process ID: ${process.pid} - Server up!`)
+    })
+  }
+
+const mongoUri = process.env.MONGOURI;
 mongoose
   .connect(mongoUri, {
     useNewUrlParser: true,
